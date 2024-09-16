@@ -1,0 +1,35 @@
+name: Build, Push and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  SERVER_USERNAME: ubuntu
+  SERVER_IP: 52.59.220.158
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+jobs:
+  build_push_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Deploy image to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SERVER_IP }}
+          username: ${{ env.SERVER_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            if [ ! -d "imtihon-6/lesson_ci_cd" ]; then
+              git clone https://github.com/D1Y0RBEKORIFJONOV/6-oy-imtihon.git mtihon-6/lesson_ci_cd
+            fi
+            cd mtihon-6/lesson_ci_cd/
+            git pull origin main
+            docker compose down
+            docker compose up --build -d
+          script_stop: true
+          timeout: 200s
