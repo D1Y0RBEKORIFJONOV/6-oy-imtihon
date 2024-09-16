@@ -9,7 +9,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:9006",
+    "host": "52.59.220.158:9006",
     "basePath": "/",
     "paths": {
         "/budget/create": {
