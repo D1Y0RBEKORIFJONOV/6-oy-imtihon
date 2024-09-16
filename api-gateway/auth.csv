@@ -1,0 +1,16 @@
+p, unauthorized, /user/register, POST
+p, unauthorized, /user/verify, POST
+p, unauthorized, /user/login, POST
+p, user, /user/*, GET
+p, user, /user/*, POST
+p, user, /user/*, PUT
+p, user, /user/*, DELETE
+p, user, /user/*, (.*)
+p, user, /user, GET
+
+p, user, /budget/*, (.*)
+p, user, /income/*, (.*)
+p, user, /report/*, (.*)
+
+
+p, unauthorized, /swagger/*, GET

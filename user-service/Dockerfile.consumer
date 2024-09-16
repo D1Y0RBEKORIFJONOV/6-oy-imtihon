@@ -1,0 +1,22 @@
+FROM golang:1.23.0-alpine AS build
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+# Navigate to the directory containing the Go main file
+WORKDIR /src/cmd/consumer
+
+RUN go build -o /bin/consumer
+
+FROM alpine:latest
+
+RUN apk add --no-cache ca-certificates
+
+COPY --from=build /bin/consumer /bin/consumer
+
+CMD ["/bin/consumer"]

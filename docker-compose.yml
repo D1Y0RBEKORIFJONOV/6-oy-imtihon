@@ -1,0 +1,191 @@
+version: '3.8'
+
+services:
+  api_gateway:
+    build: ./api-gateway
+    container_name: api_gateway
+    ports:
+      - 9006:9006
+    depends_on:
+      - user_service
+      - notification_service
+      - income-expenses
+      - broker
+      - redis
+      - report-service
+      - byudjet-service
+    networks:
+      - finance
+
+  user_service:
+    build: ./user-service
+    container_name: user_service
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+    depends_on:
+      - broker
+      - mongo
+      - notification_service
+      - consumer_user
+    networks:
+      - finance
+
+  consumer_user:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile.consumer
+    container_name: consumer_user
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    depends_on:
+      - broker
+    networks:
+      - finance
+    volumes:
+      - consumer-user-data:/app/data
+
+  income-expenses:
+    build: ./income-expenses
+    container_name: income-expenses_container
+    environment:
+      - PG_HOST=postgres
+      - PG_PORT=5432
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - finance
+
+  report-service:
+    build: ./report-service
+    container_name:  report-service
+    ports:
+      - 8000:8000
+    depends_on:
+      - income-expenses
+      - byudjet-service
+    networks:
+      - finance
+
+  byudjet-service:
+    build: ./byudjet-service
+    container_name: byudjet-service
+    ports:
+      - 8888:8888
+    depends_on:
+      - income-expenses
+      - mongo
+    networks:
+      - finance
+
+  notification_service:
+    build: ./notification-service
+    container_name: notification_service
+    ports:
+      - "9001:9001"
+    depends_on:
+      - broker
+      - mongo
+    networks:
+      - finance
+  websocket:
+    build: ./websocket
+    container_name: ws
+    ports:
+      - "9005:9005"
+    depends_on:
+      - redis
+      - notification_service
+    networks:
+      - finance
+
+
+  broker:
+    image: apache/kafka:latest
+    container_name: broker
+    ports:
+      - "9092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    networks:
+      - finance
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-db-data:/data/db
+    networks:
+      - finance
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=+_+2005+_+
+      - PG_URL=postgres://postgres:+_+2005+_+@postgres:5432/postgres?sslmode=disable
+    volumes:
+      - income-db-data:/var/lib/postgresql/data
+      - ./income-service/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres || exit 1" ]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - finance
+
+
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./income-expenses/migrations:/migrations
+    command: ["-path", "/migrations", "-database", "postgres://postgres:+_+2005+_+@postgres:5432/postgres?sslmode=disable", "up"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finance
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG || exit 1"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - finance
+
+networks:
+  finance:
+    driver: bridge
+
+volumes:
+  income-db-data:
+  mongo-db-data:
+  consumer-user-data:

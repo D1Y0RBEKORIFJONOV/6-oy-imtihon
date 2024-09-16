@@ -1,0 +1,41 @@
+syntax="proto3";
+
+option go_package="/incomepb";
+
+message CreateIncomeExpensesRequest{
+  string category=1;
+  string currency=2;
+  float amount=3;
+  string date=4;
+  string type=5;
+  string UserId=6;
+}
+
+message CreateIncomeExpensesResponse{
+  string message=1;
+  string transactionid=2;
+}
+
+message GetInfoRequest{
+  string user_id=1;
+}
+
+message InfoResponse{
+  string transactionid=1;
+  string type=2;
+  string category=3;
+  string currency=4;
+  float amount=5;
+  string date=6;
+  string UserId=7;
+}
+
+message GetInfoResponse{
+  repeated InfoResponse info=1;
+}
+
+service IncomeExpenses{
+  rpc Income(CreateIncomeExpensesRequest)returns(CreateIncomeExpensesResponse);
+  rpc Expenses (CreateIncomeExpensesRequest) returns (CreateIncomeExpensesResponse);
+  rpc Info(GetInfoRequest)returns(GetInfoResponse);
+}

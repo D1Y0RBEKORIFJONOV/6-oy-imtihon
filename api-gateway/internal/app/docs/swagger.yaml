@@ -1,0 +1,825 @@
+basePath: /
+definitions:
+  entity.Budget:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      category:
+        type: string
+      currency:
+        type: string
+      spent:
+        type: number
+    type: object
+  entity.CreateBudgetRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      currency:
+        type: string
+    type: object
+  entity.CreateBudgetResponse:
+    properties:
+      budget_id:
+        type: string
+      message:
+        type: string
+    type: object
+  entity.CreateIncomeExpensesRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      type:
+        type: string
+    type: object
+  entity.CreateIncomeExpensesResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  entity.CreateUserReq:
+    properties:
+      address:
+        type: string
+      confirm_password:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    type: object
+  entity.DeleteUserReq:
+    properties:
+      is_hard_deleted:
+        type: boolean
+    type: object
+  entity.FromTillResponse:
+    properties:
+      total_amount:
+        type: number
+    type: object
+  entity.GetAllUserRes:
+    properties:
+      count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+    type: object
+  entity.GetBudgetsResponse:
+    properties:
+      budgets:
+        $ref: '#/definitions/entity.Budget'
+    type: object
+  entity.GetInfoResponse:
+    properties:
+      info:
+        items:
+          $ref: '#/definitions/entity.InfoResponse'
+        type: array
+    type: object
+  entity.IncomeExpenseResponse:
+    properties:
+      net_savings:
+        type: number
+      total_expenses:
+        type: number
+      total_income:
+        type: number
+    type: object
+  entity.InfoResponse:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  entity.ListSpendingResponse:
+    properties:
+      spent:
+        items:
+          $ref: '#/definitions/entity.SpendingResponse'
+        type: array
+    type: object
+  entity.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  entity.LoginRes:
+    properties:
+      token:
+        $ref: '#/definitions/entity.Token'
+    type: object
+  entity.Profile:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      first_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.SpendingResponse:
+    properties:
+      category:
+        type: string
+      total_spent:
+        type: number
+    type: object
+  entity.StatusMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  entity.Token:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  entity.UpdateBudgetRequest:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      spent:
+        type: number
+    type: object
+  entity.UpdateBudgetResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  entity.UpdateEmailReq:
+    properties:
+      new_email:
+        type: string
+    type: object
+  entity.UpdatePasswordReq:
+    properties:
+      new_password:
+        type: string
+      password:
+        type: string
+    type: object
+  entity.UpdateUserReq:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      profile:
+        $ref: '#/definitions/entity.Profile'
+    type: object
+  entity.VerifyUserReq:
+    properties:
+      email:
+        type: string
+      secret_code:
+        type: string
+    type: object
+host: localhost:9006
+info:
+  contact: {}
+  description: This is a sample server for a restaurant reservation system.
+  title: Artisan Connect
+  version: "1.0"
+paths:
+  /budget/{budget_id}:
+    patch:
+      consumes:
+      - application/json
+      description: update a user budget
+      parameters:
+      - description: Budget create information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateBudgetRequest'
+      - description: budget_id
+        in: path
+        name: budget_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UpdateBudgetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: UpdateBudget
+      tags:
+      - budget
+  /budget/{category}:
+    get:
+      consumes:
+      - application/json
+      description: get a user budget
+      parameters:
+      - description: category
+        in: path
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.GetBudgetsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetBudget
+      tags:
+      - budget
+  /budget/create:
+    post:
+      consumes:
+      - application/json
+      description: create a new budget
+      parameters:
+      - description: Budget create information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateBudgetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CreateBudgetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: CreateBudget
+      tags:
+      - budget
+  /income:
+    get:
+      consumes:
+      - application/json
+      description: GetIncome  income
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.GetInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetIncome
+      tags:
+      - income
+  /income/create/expenses:
+    post:
+      consumes:
+      - application/json
+      description: create a new income
+      parameters:
+      - description: Budget create information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateIncomeExpensesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CreateIncomeExpensesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Expenses
+      tags:
+      - income
+  /income/create/income:
+    post:
+      consumes:
+      - application/json
+      description: create a new income
+      parameters:
+      - description: Budget create information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateIncomeExpensesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.CreateIncomeExpensesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: CreateIncome
+      tags:
+      - income
+  /report/chosen/{start_at}/{end_at}:
+    get:
+      consumes:
+      - application/json
+      description: GetFromTill  expenses
+      parameters:
+      - description: start_at
+        in: path
+        name: start_at
+        required: true
+        type: string
+      - description: end_at
+        in: path
+        name: end_at
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.FromTillResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetFromTill
+      tags:
+      - report
+  /report/expenses:
+    get:
+      consumes:
+      - application/json
+      description: GetExpenses  expenses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.IncomeExpenseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetExpenses
+      tags:
+      - report
+  /report/spending:
+    get:
+      consumes:
+      - application/json
+      description: GetSpending  speding
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ListSpendingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetSpending
+      tags:
+      - report
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by field and value
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: GetUser
+      tags:
+      - user
+  /user/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user information by field and value with pagination
+      parameters:
+      - description: Field to filter by
+        in: query
+        name: field
+        type: string
+      - description: Value to filter by
+        in: query
+        name: value
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users" // Adjust this to match your user object structure
+          schema:
+            $ref: '#/definitions/entity.GetAllUserRes'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - user
+  /user/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.DeleteUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: DeleteUser
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LoginRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Login
+      tags:
+      - auth
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User registration information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Register
+      tags:
+      - auth
+  /user/update:
+    put:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: UpdateUser
+      tags:
+      - user
+  /user/update/email:
+    put:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateEmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: UpdateEmail
+      tags:
+      - user
+  /user/update/password:
+    put:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdatePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: UpdatePassword
+      tags:
+      - user
+  /user/verify:
+    post:
+      consumes:
+      - application/json
+      description: Confirm the code sent to the email
+      parameters:
+      - description: User verification information
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.VerifyUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusMessage'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: VerifyUser
+      tags:
+      - auth
+schemes:
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,0 +1,38 @@
+syntax = "proto3";
+option go_package = "./internal/protos/reportproto";
+
+service ReportService{
+    rpc SpendingbyCategory(SpendingRequest) returns(ListSpendingResponse);
+    rpc IncomeExpense(SpendingRequest) returns (IncomeExpenseResponse);
+    rpc FromTill(FromTillRequest) returns (FromTillResponse);
+}
+
+message IncomeExpenseResponse{
+    float totalIncome = 1;
+    float totalExpenses = 2;
+    float netSavings = 3;
+}
+
+message SpendingRequest{
+    string user_id = 1;
+}
+
+message SpendingResponse{
+    string category = 1;
+    float totalspent = 2;
+}
+
+message ListSpendingResponse{
+    repeated SpendingResponse spent = 1;
+}
+
+message FromTillRequest{
+    string startTime = 1;
+    string endTime = 2;
+    string user_id = 3;
+}
+
+message FromTillResponse{
+    float totalAmount = 1;
+}
+
