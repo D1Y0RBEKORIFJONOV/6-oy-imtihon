@@ -25,9 +25,9 @@ jobs:
           key: ${{ env.SSH_PRIVATE_KEY }}
           script: |
             if [ ! -d "imtihon-6/lesson_ci_cd" ]; then
-              git clone https://github.com/D1Y0RBEKORIFJONOV/6-oy-imtihon.git mtihon-6/lesson_ci_cd
+              git clone https://github.com/D1Y0RBEKORIFJONOV/6-oy-imtihon.git imtihon-6/lesson_ci_cd
             fi
-            cd mtihon-6/lesson_ci_cd/
+            cd imtihon-6/lesson_ci_cd/
             git pull origin main
             docker compose down
             docker compose up --build -d
