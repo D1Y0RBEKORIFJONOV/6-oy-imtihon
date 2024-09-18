@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"budgetservice/internal/config"
 	"budgetservice/internal/infrastructura/mongodb"
 	"budgetservice/internal/service"
 	"context"
@@ -14,7 +15,8 @@ import (
 )
 
 func NewMongodb() (*mongo.Client, *mongo.Collection, error) {
-	clientOptions := options.Client().ApplyURI("mongodb://mongo:27017")
+	c:=config.Configuration()
+	clientOptions := options.Client().ApplyURI(c.Mongo.Url)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

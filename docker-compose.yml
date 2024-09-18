@@ -27,6 +27,8 @@ services:
       - mongo
       - notification_service
       - consumer_user
+    ports:
+      - 9000:9000
     networks:
       - finance
 

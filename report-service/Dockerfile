@@ -12,8 +12,10 @@ RUN go build -o main cmd/main.go
 
 FROM alpine:3.18
 
+
 WORKDIR /app
 
 COPY --from=builder /app/main .
+
 
 CMD ["./main"]
